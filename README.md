@@ -1,4 +1,4 @@
-## WISeREP-Spider version 0.1
+## WISeWEB-Spider version 0.1
 Original Author: Jerod Parrent
 
 ###Description
