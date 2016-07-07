@@ -1,16 +1,16 @@
 #!/usr/bin/python
 
 """
-==============================================================================
+==================================================================================
 title           :wiserep-spider.py
-description     :This will create a header for a python script.
+description     :Scrapes and downloads all publicly availabe spectra from WISeREP.
 author          :Jerod Parrent
 date            :2016-07-06
 version         :0.1
 usage           :python wiserep-spider.py
 notes           :runtime with pages saved and no exlusions = 18.7 hours
 python_version  :2.7.12 
-==============================================================================
+==================================================================================
 
 TO-DO, refactor to:
 items.py
