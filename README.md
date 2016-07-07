@@ -15,7 +15,7 @@ python wiserep-spider.py
 
 ###Future Versions
 * refactor code to be object-oriented and modular via items.py, pipelines.py, settings.py, wiserep-spider.py
-* add "update" feature to update a directory when either new spectra have been uploaded to WISeREP, or private spectra have been made public 
+* add "update" function to collect data when either new spectra have been uploaded to WISeREP, or private spectra have been made public 
 
 ### Dependencies and Credits
 
