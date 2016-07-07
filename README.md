@@ -10,7 +10,7 @@ Without excluding by event type and/or survey program (UCB, CfA, SuSpect, etc), 
 
 ###Usage
 ```
-python wiserep-spider.py
+python wiseweb-spider.py
 ```
 
 ###Future Versions
