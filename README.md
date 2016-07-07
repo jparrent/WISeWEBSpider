@@ -14,6 +14,7 @@ python wiseweb-spider.py
 ```
 
 ###Future Versions
+* rewrite for Python3
 * refactor code to be object-oriented and modular via items.py, pipelines.py, settings.py, wiseweb-spider.py
 * add "update" function to collect data when either new spectra have been uploaded to WISeREP, or private spectra have been made public 
 
