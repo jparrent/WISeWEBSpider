@@ -8,7 +8,7 @@ The script guards against spectra already collected, duplicate files found on WI
 
 Without excluding by event type and/or survey program (UCB, CfA, SuSpect, etc), the full runtime for scraping everything is about 18.7 hours. Fortunately this need only be done once.
 
-###Usage:
+###Usage
 ```
 python wiserep-spider.py
 ```
