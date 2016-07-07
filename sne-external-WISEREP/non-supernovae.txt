@@ -1,0 +1,341 @@
+TCPJ17344775-2409042 is a Varstar
+TCPJ13535979-0755079 is a Other
+SSS130402-141135-282828 is a Varstar
+SSS130329-111742-203116 is a Varstar
+SSS130312-140859-165709 is a Varstar
+SSS130311-111518-452917 is a Varstar
+SSS130304-102431-192214 is a Other
+SSS130304-055628-172343 is a CV
+SNhunt242 is a Other
+SN2010U is a Nova
+SN2008S is a ILRT
+SN2008dx is a 
+SN2007sv is a SN impostor
+SN2007sj is a 
+SN2007rj is a 
+SN2007rg is a 
+SN2007rd is a 
+SN2007rc is a 
+SN2007nb is a 
+SN2007lr is a 
+SN2007jy is a 
+SN2007jv is a 
+SN2007jc is a 
+SN2007iq is a 
+SN2007ii is a 
+SN2006oz is a 
+SN2006kg is a AGN
+SN2006ju is a 
+SN2006ga is a 
+SN2006fs is a 
+SN2006fb is a 
+SN2005eo is a 
+SN2005ea is a 
+SN2004cy is a Other
+SN1999fs is a Other
+SN1999fg is a Other
+SN1997D is a 
+SN1996bt is a 
+SN1994N is a 
+SN1992H is a 
+SN1992C is a 
+SN1992ah is a 
+SN1992ac is a 
+SN1991J is a 
+SN1991F is a 
+SN1991D is a 
+SN1991C is a 
+SN1991B is a 
+SN1991ad is a 
+SN1991A is a 
+SN1990X is a 
+SN1990V is a 
+SN1990R is a 
+SN1990G is a 
+SN1990E is a 
+SN1990ae is a 
+SN1990aa is a 
+SN1989C is a 
+SN1989B is a 
+SN1988L is a 
+SN1988H is a 
+SN1981B is a 
+SN1971G is a 
+SN1970A is a 
+SN1969L is a 
+SN1968M is a 
+SN1968I is a 
+SN1968E is a 
+SN1966J is a 
+SN1966G is a 
+SN1964F is a 
+SN1964E is a 
+SN1962L is a 
+SN1962J is a 
+SN1961V is a 
+SN1960N is a Other
+SN1957B is a 
+SN1957A is a 
+SN1956A is a 
+SN1954B is a 
+SN1954A is a 
+SN1948B is a 
+SN1939A is a 
+SN1937D is a 
+SN1937C is a 
+SMTJ13455799-3532544 is a Other
+SMT16atf is a 
+SKY_J5271481-4716073 is a Galaxy
+Q1434.7+5444 is a AGN
+PTF12hqm is a Nova
+PTF11qij is a Nova
+PTF11kqn is a AGN
+PTF11dsf is a 
+PTF11dij is a 
+PTF11dad is a Other
+PTF10qpf is a Varstar
+PTF10iya is a Other
+PTF10fqs is a ILRT
+PTF09ge is a TDE
+PTF09djl is a TDE
+PTF09axc is a TDE
+PSNJ15213475-0722183 is a LBV
+PSNJ12393328+1525520 is a Other
+PSNJ09132750+7627410 is a SN impostor
+PSNJ09093496+3307204 is a 
+PSNJ07475117-1844586 is a LBV
+PSNJ06120295-2149353 is a Other
+PSNJ01184597+1459402 is a Other
+PS16uk is a CV
+PS15dqx is a Other
+PS15ddr is a Other
+PS15dbp is a LBV
+PS15cyh is a Other
+PS15cmq is a Other
+PS15cgd is a AGN
+PS15br is a 
+PS1-14pw is a Varstar
+PS1-14ip is a Varstar
+PS1-12ym is a Other
+PS1-12btz is a Other
+PS1-12agr is a Galaxy
+OGLE16aaa is a 
+OGLE15xt is a Other
+OGLE15xl is a Other
+OGLE15tt is a Other
+OGLE15rd is a Galaxy
+OGLE15iy is a AGN
+OGLE15ic is a AGN
+OGLE15gt is a AGN
+OGLE15gb is a Other
+OGLE15dv is a Galaxy
+OGLE-2015-SN-035 is a Other
+OGLE-2015-SN-020 is a Other
+OGLE-2015-SN-010 is a Varstar
+OGLE-2014-SN-189 is a Other
+OGLE-2014-SN-173 is a Other
+OGLE-2014-SN-155 is a Galaxy
+OGLE-2014-SN-145 is a AGN
+OGLE-2014-SN-131 is a Other
+OGLE-2014-SN-122 is a Galaxy
+OGLE-2014-SN-111 is a Other
+OGLE-2014-SN-076 is a Galaxy
+OGLE-2014-SN-052 is a Galaxy
+OGLE-2014-SN-047 is a Other
+OGLE-2014-SN-012 is a Other
+OGLE-2014-SN-009 is a Other
+OGLE-2013-SN-138 is a Other
+OGLE-2013-SN-137 is a LBV
+OGLE-2013-SN-131 is a Galaxy
+OGLE-2013-SN-128 is a Other
+OGLE-2013-SN-103 is a Other
+OGLE-2013-SN-100 is a Other
+OGLE-2013-SN-090 is a AGN
+OGLE-2013-SN-088 is a AGN
+OGLE-2013-SN-050 is a Galaxy
+OGLE-2013-SN-012 is a Other
+OGLE-2013-NOVA-02 is a Other
+NGC772-OT1 is a Other
+MLS140425-152525-191348 is a Other
+MLS140220-081342+181306 is a Other
+MLS140111-122630-031800 is a AGN
+MLS140107-065605+251444 is a Other
+MLS131226-043639+143734 is a Other
+MASTERJ150302.53-674306.4 is a CV
+MASTERJ141023.42-431843.7 is a Other
+MASTERJ085854.16-2740307 is a Varstar
+MASTERJ081031.62+111450.2 is a Other
+MASTERJ07485845-6553446 is a Varstar
+MASTERJ053953-275546 is a Other
+LSQ16bs is a Nova
+LSQ15xn is a Other
+LSQ15xi is a Varstar
+LSQ15mj is a Other
+LSQ15in is a Other
+LSQ15hy is a Galaxy
+LSQ15ey is a Other
+LSQ15bpg is a Other
+LSQ14zl is a CV
+LSQ14ws is a CV
+LSQ14vv is a Other
+LSQ14vr is a Varstar
+LSQ14uv is a Varstar
+LSQ14tf is a Other
+LSQ14n is a Other
+LSQ14lh is a Galaxy
+LSQ14ii is a Other
+LSQ14gig is a Other
+LSQ14gaz is a Other
+LSQ14fzb is a Other
+LSQ14fxj is a Other
+LSQ14fum is a Varstar
+LSQ14fnm is a Other
+LSQ14fgo is a Other
+LSQ14efq is a CV
+LSQ14efd is a Other
+LSQ14eez is a Other
+LSQ14dvq is a CV
+LSQ14dss is a CV
+LSQ14dsj is a Varstar
+LSQ14doz is a Other
+LSQ14doj is a CV
+LSQ14dc is a Other
+LSQ14cx is a Galaxy
+LSQ14ck is a Galaxy
+LSQ14bjb is a Other
+LSQ14azl is a Other
+LSQ14axu is a Other
+LSQ14ahd is a Varstar
+LSQ14afa is a Varstar
+LSQ14abu is a Other
+LSQ14aab is a Other
+LSQ13zm is a SN impostor
+LSQ13fp is a Other
+LSQ13dsu is a Other
+LSQ13dsf is a Galaxy
+LSQ13doe is a Other
+LSQ13dht is a Varstar
+LSQ13der is a Other
+LSQ13deg is a Other
+LSQ13ddu is a Other
+LSQ13ddb is a 
+LSQ13bxh is a CV
+LSQ13bsj is a CV
+LSQ13bpd is a CV
+LSQ13bjs is a 
+LSQ13bbb is a Galaxy
+LSQ13baa is a Galaxy
+LSQ13azj is a Varstar
+LSQ13awl is a Galaxy
+LSQ13avm is a Varstar
+LSQ13aav is a Other
+LSQ12hzo is a Galaxy
+LSQ12hud is a Galaxy
+LSQ12hqa is a Other
+LSQ12hot is a Galaxy
+LSQ12hlx is a Other
+LSQ12hkd is a Other
+LSQ12hdl is a Other
+LSQ12hcu is a 
+LSQ12hbx is a 
+LSQ12gxv is a Other
+LSQ12gvs is a 
+LSQ12gld is a Galaxy
+LSQ12gla is a Other
+LSQ12gjf is a Other
+LSQ12ggx is a Galaxy
+LSQ12gad is a Galaxy
+LSQ12fyf is a Other
+LSQ12fww is a Varstar
+LSQ12ftr is a Varstar
+LSQ12fnm is a Other
+LSQ12flb is a Other
+LSQ12fkh is a Galaxy
+LSQ12fjm is a Other
+LSQ12fgy is a Galaxy
+LSQ12fgx is a Varstar
+LSQ12fdx is a AGN
+LSQ12ezn is a Other
+LSQ12emc is a Varstar
+LSQ12elq is a Varstar
+LSQ12eij is a Other
+LSQ12ehj is a AGN
+LSQ12eeq is a Varstar
+LSQ12ecu is a Galaxy
+LSQ12ecb is a Varstar
+LSQ12dyw is a Other
+LSQ12dww is a Varstar
+LSQ12dvr is a Varstar
+LSQ12dvl is a 
+LSQ12cbv is a Varstar
+LSQ12cay is a Other
+LSQ12bue is a Other
+LSQ12btv is a Galaxy
+LSQ12btf is a Galaxy
+LSQ12bsx is a 
+LSQ12bqo is a Other
+LSQ12bql is a Galaxy
+iPTF14aiv is a TDE
+HD56925 is a WR-WN
+HD313846 is a WR-WN
+HD313643 is a WR-WC
+HD228766 is a WR-WN
+HD214419 is a WR-WN
+HD213049 is a WR-WC
+HD211853 is a WR-WN
+HD211564 is a WR-WN
+HD195177 is a WR-WC
+HD193928 is a WR-WN
+HD193793 is a WR-WC
+HD192641 is a WR-WC
+HD192163 is a WR-WN
+HD192103 is a WR-WC
+HD191765 is a WR-WN
+HD190918 is a WR-WN
+HD190002 is a WR-WC
+HD187282 is a WR-WN
+HD186943 is a WR-WN
+HD184738 is a WR-WC
+HD177656 is a WR-WC
+HD168206 is a WR-WC
+HD165763 is a WR-WC
+Gaia16afr is a Varstar
+Gaia16acw is a Varstar
+G191B2B is a Std-spec
+Feige34 is a Std-spec
+Eta Carinae is a LBV
+EMILIA is a Other
+CSS151221-103938+181146 is a Other
+CSS141223-113342+004332 is a Other
+CSS141015-212902+051800 is a Other
+CSS140925-005854+181322 is a Other
+CSS140914-021317-071932 is a Other
+CSS140914-010107-101840 is a Other
+CSS140901-215624+190642 is a Other
+CSS140424-133007-212728 is a Other
+CSS140421-142042+031602 is a Other
+CSS140128-045040+200126 is a Other
+CSS131207-082957-010201 is a Varstar
+CSS131025-044730+235856 is a Other
+CSS130905-012848-003631 is a CV
+CSS130305-154128+304350 is a 
+CSS130214-131241-043429 is a Other
+CSS121125-052126-165258 is a Other
+CSS121004-204336-055316 is a CV
+BD+332642 is a Std-spec
+BD+28d4211 is a Std-spec
+BD+262606 is a Std-spec
+BD+174708 is a Std-spec
+AT2016bls is a 
+AT2016aja is a 
+ASASSN-15ug is a 
+ASASSN-15oi is a Other
+ASASSN-15mj is a 
+ASASSN-15ek is a CV
+ASASSN-14li is a TDE
+ASASSN-14ko is a AGN
+ASASSN-14gs is a Varstar
+ASASSN-14fr is a Varstar
+ASASSN-14fi is a Varstar
+ASASSN-14fh is a CV
+ASASSN-14ae is a TDE
