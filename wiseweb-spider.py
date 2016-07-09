@@ -24,7 +24,7 @@ getObjHeader(), etc
 and Python3
 """
 
-import os, sys, time, pickle
+import os, sys, time, json #pickle
 import re, unicodedata, itertools
 import urllib, urllib2, requests, mechanize, html2text, cookielib
 from collections import OrderedDict
@@ -83,44 +83,37 @@ exclude_program = [
 'CSP',
 'UCB-SNDB',
 'CfA-Ia',
-'CfA-Ibc'
+'CfA-Ibc',
+'CfA-Stripped',
 'SNfactory',
 'HIRES'
 ]
 
 # exclude_program = ['HIRES']
 
-#dig up list of known non-supernovae, or create if it does not exist
-if os.path.exists(_PATH+_DIR_INTERNAL+'non_SN.pickle'):
-	with open(_PATH+_DIR_INTERNAL+'non_SN.pickle', 'rb') as pickle_in:
-		non_SN = pickle.load(pickle_in)
+#dig up lists of known non-supernovae and completed events, or create if it does not exist
+if os.path.exists(_PATH+_DIR_INTERNAL+'lists.json'):
+	with open(_PATH+_DIR_INTERNAL+'lists.json', 'r') as json_in:
+		list_dict = json.load(json_in)
 else:
-	non_SN = []
+	list_dict = {
+		'non_SN': [],
+		'completed': []
+	}
 
-#dig up completed list of events, or create if it does not exist
-if os.path.exists(_PATH+_DIR_INTERNAL+'completed.pickle'):
-	with open(_PATH+_DIR_INTERNAL+'completed.pickle', 'rb') as pickle_in:
-		completed = pickle.load(pickle_in)
-else:
-	completed = []
+# #uncomment to re-initialize
+# list_dict['completed'] = []
+# list_dict['non_SN'] = []
 
 #locate objects search form
 def select_obj_form(form):
 	  return form.attrs.get('action', None) == '/objects/list'
 
-#update non-supernova list pickle
-def updateNonSNPickle(SNname, SNlist):
-	SNlist.append(SNname)
-	with open(_PATH+_DIR_INTERNAL+'non_SN.pickle', 'wb') as pickle_out:
-		pickle.dump(SNlist, pickle_out)
-		pickle_out.close()
-
-#update completed list pickle
-def updateCompletedPickle(SNname, SNlist):
-	SNlist.append(SNname)
-	with open(_PATH+_DIR_INTERNAL+'completed.pickle', 'wb') as pickle_out:
-		pickle.dump(SNlist, pickle_out)
-		pickle_out.close()		
+#update lists.json
+def updateListsJson(SNname, dict):
+	dict.append(SNname)
+	with open(_PATH+_DIR_INTERNAL+'lists.json','w') as fp:
+		json.dump(list_dict, fp, indent=4)
 
 def savePage(name, page):
 	with open(_PATH+_DIR_INTERNAL+'WISEREP-'+name+'.html', 'w') as f:
@@ -144,10 +137,10 @@ SN_list_tags = soup.find("select", {"name":"objid"}).find_all("option")[1:] #rem
 for item in SN_list_tags:
 
 	SNname = item.get_text()
-	if SNname in non_SN:
+	if SNname in list_dict['non_SN']:
 		print SNname, 'is not a supernova -- Skipping'
 		continue
-	elif SNname in completed:
+	elif SNname in list_dict['completed']:
 		print SNname, 'already done'
 		continue
 
@@ -194,7 +187,7 @@ for item in SN_list_tags:
 	try:
 		headers = soup.find("tr",{"style":"font-weight:bold"}).findChildren("td")
 	except AttributeError:
-		updateCompletedPickle(SNname,completed)
+		updateListsJson(SNname, list_dict['completed'])
 		print '\t', SNname, 'has no available spectra'
 		with open(_PATH+_DIR_WISEREP+'scraper-log.txt', 'a') as f:
 			f.write('From statement 1: ' + SNname + ' has no spectra to collect' + '\n')
@@ -251,12 +244,13 @@ for item in SN_list_tags:
 					with open(_PATH+_DIR_WISEREP+'scraper-log.txt', 'a') as f:
 						f.write('From statement 2: ' + SNname + ' has no spectra to collect' + '\n')
 						f.close()
+					continue
 
 	#exclude non-SN
 	SNtype = target[type_idx].text
 	if SNtype in exclude_type:
-		updateNonSNPickle(SNname, non_SN)
-		updateCompletedPickle(SNname,completed)
+		updateListsJson(SNname, list_dict['non_SN'])
+		updateListsJson(SNname, list_dict['completed'])
 		print '\t', SNname, 'is a', SNtype
 		with open(_PATH+_DIR_WISEREP+'non-supernovae.txt', 'a') as f:
 			f.write(SNname + ' is a ' + SNtype + '\n')
@@ -264,7 +258,7 @@ for item in SN_list_tags:
 		continue
 
 	elif SNtype == '':
-		SNtype = 'Unspecified by WISeREP'
+		#SNtype = 'Unspecified by WISeREP'
 		print '\tType not specified by WISeREP -- check the Open Supernova Catalog for type'
 		with open(_PATH+_DIR_WISEREP+'scraper-log.txt', 'a') as f:	
 			f.write('Type not specified by WISeREP -- check the Open Supernova Catalog for type')
@@ -274,7 +268,7 @@ for item in SN_list_tags:
 	num_total_spec = target[num_total_spec_idx].text
 	num_total_spec = unicodedata.normalize("NFKD",num_total_spec)
 	if num_total_spec == u'  ' or num_total_spec == u' 0 ':
-		updateCompletedPickle(SNname,completed)
+		updateListsJson(SNname, list_dict['completed'])
 		print '\t', SNname,'has no spectra to collect'
 		with open(_PATH+_DIR_WISEREP+'scraper-log.txt', 'a') as f:
 			f.write('From statement 3: ' + SNname + ' has no spectra to collect' + '\n')
@@ -405,7 +399,7 @@ for item in SN_list_tags:
 			f.close()
 
 	elif num_pub_spectra == 0:
-		updateCompletedPickle(SNname,completed)
+		updateListsJson(SNname, list_dict['completed'])
 		savePage(SNname, results_page)
 		print '\tAll spectra for', SNname, 'are still private'
 		with open(_PATH+_DIR_WISEREP+'private-spectra-log.txt', 'a') as f:
@@ -413,7 +407,15 @@ for item in SN_list_tags:
 				f.close()
 		continue
 
-	if len(spectrum_haul) == 1:
+	if len(spectrum_haul) == 0:
+		print '\tNot collecting spectra at this time'
+		with open(_PATH+_DIR_WISEREP+'scraper-log.txt', 'a') as f:
+				f.write('Not collecting spectra of ' + SNname + ' at this time' + '\n')
+				f.close()
+		updateListsJson(SNname, list_dict['completed'])
+		savePage(SNname, results_page)
+
+	elif len(spectrum_haul) == 1:
 
 		print '\tDownloading 1 public spectrum'
 
@@ -430,14 +432,17 @@ for item in SN_list_tags:
 		#add README for basic metadata to SNname subdirectory
 		print '\tWriting README' 
 
-		f = open(_PATH+_DIR_WISEREP+SNname+'/README.txt','wb')
-		for file in SN_dict[SNname].keys():
-			f.write(file+'\n')
-			for key in SN_dict[SNname][file].keys():
-				f.write('\t' + '%-*s  %s' % (20, key + ':', SN_dict[SNname][file][key]) + '\n')
-		f.close()
+		# f = open(_PATH+_DIR_WISEREP+SNname+'/README.txt','wb')
+		# for file in SN_dict[SNname].keys():
+		# 	f.write(file+'\n')
+		# 	for key in SN_dict[SNname][file].keys():
+		# 		f.write('\t' + '%-*s  %s' % (20, key + ':', SN_dict[SNname][file][key]) + '\n')
+		# f.close()
 
-		updateCompletedPickle(SNname,completed)
+		with open(_PATH+_DIR_WISEREP+SNname+'/README.json','w') as fp:
+			json.dump(SN_dict[SNname], fp, indent=4)
+
+		updateListsJson(SNname, list_dict['completed'])
 		savePage(SNname, results_page)
 
 	elif len(spectrum_haul) > 1:
@@ -505,14 +510,17 @@ for item in SN_list_tags:
 		#add README for basic metadata to SNname subdirectory
 		print '\tWriting README' 
 
-		f = open(_PATH+_DIR_WISEREP+SNname+'/README.txt','wb')
-		for file in SN_dict[SNname].keys():
-			f.write(file+'\n')
-			for key in SN_dict[SNname][file].keys():
-				f.write('\t' + '%-*s  %s' % (20, key + ':', SN_dict[SNname][file][key]) + '\n')
-		f.close()
+		# f = open(_PATH+_DIR_WISEREP+SNname+'/README.txt','wb')
+		# for file in SN_dict[SNname].keys():
+		# 	f.write(file+'\n')
+		# 	for key in SN_dict[SNname][file].keys():
+		# 		f.write('\t' + '%-*s  %s' % (20, key + ':', SN_dict[SNname][file][key]) + '\n')
+		# f.close()
 
-		updateCompletedPickle(SNname,completed)
+		with open(_PATH+_DIR_WISEREP+SNname+'/README.json','w') as fp:
+			json.dump(SN_dict[SNname], fp, indent=4)
+
+		updateListsJson(SNname, list_dict['completed'])
 		savePage(SNname, results_page)
 
 #execution time in minutes
@@ -521,4 +529,8 @@ print("Runtime: %s minutes" % minutes)
 with open(_PATH+_DIR_WISEREP+'scraper-log.txt', 'a') as f:
 			f.write('Runtime: ' + str(minutes) + ' minutes')
 			f.close()
+
+#reset completed to 0 once all done
+list_dict['completed'] = []
+updateListsJson(SNname, list_dict['completed'])
 
