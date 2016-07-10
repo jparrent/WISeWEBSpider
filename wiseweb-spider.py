@@ -102,12 +102,16 @@ else:
 	}
 
 # #uncomment to re-initialize
-# list_dict['completed'] = []
+#list_dict['completed'] = []
 # list_dict['non_SN'] = []
 
 #locate objects search form
 def select_obj_form(form):
 	  return form.attrs.get('action', None) == '/objects/list'
+
+def mkSNdir(SNname):
+	if not os.path.exists(_PATH+_DIR_WISEREP+SNname):
+		os.mkdir(_PATH+_DIR_WISEREP+SNname)
 
 #update lists.json
 def updateListsJson(SNname, dict):
@@ -173,11 +177,23 @@ for item in SN_list_tags:
 	br.open(_WISEREP_OBJECTS_URL)
 
 	#ready search form with field entries and submit
-	br.select_form(predicate=select_obj_form)
+	while True:
+		try:
+			br.select_form(predicate=select_obj_form)
+		except IncompleteRead:
+			continue
+		break
+
 	br.form['name'] = SNname
 	br.form['rowslimit'] = '1000'
-	br.submit()
 
+	while True:
+		try:
+			br.submit()
+		except URLError:
+			continue
+		break
+		
 	#results page
 	results_page = br.response().read()
 	soup = BeautifulSoup(results_page,"lxml")
@@ -420,7 +436,8 @@ for item in SN_list_tags:
 		print '\tDownloading 1 public spectrum'
 
 		#make SNname subdirectory
-		os.mkdir(_PATH+_DIR_WISEREP+SNname)
+		#os.mkdir(_PATH+_DIR_WISEREP+SNname)
+		mkSNdir(SNname)
 
 		for filename, url in spectrum_haul.items():
 			rq = urllib2.Request(url)
@@ -448,7 +465,8 @@ for item in SN_list_tags:
 	elif len(spectrum_haul) > 1:
 
 		#make SNname subdirectory
-		os.mkdir(_PATH+_DIR_WISEREP+SNname)
+		#os.mkdir(_PATH+_DIR_WISEREP+SNname)
+		mkSNdir(SNname)
 
 		for filename, metadata in SN_dict[SNname].items():
 			if metadata['Reduction Status'] == 'rapid':
