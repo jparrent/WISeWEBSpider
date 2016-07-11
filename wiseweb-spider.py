@@ -26,7 +26,7 @@ and Python3
 
 import os, sys, time, json #pickle
 import re, unicodedata, itertools
-import urllib, urllib2, requests, mechanize, html2text, cookielib
+import urllib, urllib2, requests, mechanize, cookielib
 from collections import OrderedDict
 from bs4 import BeautifulSoup
 
