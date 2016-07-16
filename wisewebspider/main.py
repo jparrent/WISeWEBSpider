@@ -2,15 +2,15 @@
 
 """
 ===============================================================================
-title           :wiseweb-spider.py
+title           :main.py for wisewebspider package
 description     :Scrapes and downloads all publicly availabe spectra from
                  WISeREP.
-author          :Jerod Parrent
-date            :2016-07-06
-version         :0.1
-usage           :python wiserep-spider.py
+authors          :Jerod Parrent, James Guillochon
+date            :2016-07-16
+version         :0.2
+usage           :python3.5 -m wiserepspider
 notes           :runtime with pages saved and no exlusions = 18.7 hours
-python_version  :2.7.12
+python_version  :3.5.2
 ===============================================================================
 
 TO-DO, refactor to:
