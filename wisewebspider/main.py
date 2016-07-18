@@ -331,6 +331,8 @@ def main():
                 observer_idx = i
             if header.text == 'Obs.date':
                 obsdate_idx = i
+            if header.text == 'Reducer':
+                reducer_idx = i
             if header.text == 'Ascii/Fits Files':
                 filename_idx = i
             if header.text == 'Publish':
@@ -400,6 +402,7 @@ def main():
             instrument = children[instrument_idx].text
             observer = children[observer_idx].text
             obsdate = children[obsdate_idx].text
+            reducer = children[reducer_idx].text
             last_modified = children[last_mod_idx].text
             modified_by = children[modified_by_idx].text
 
@@ -421,6 +424,7 @@ def main():
                 ("Bibcode", bibcode),
                 ("Instrument", instrument),
                 ("Observer", observer),
+                ("Reducer", reducer),
                 ("Reduction Status", status),
                 ("Last Modified", last_modified),
                 ("Modified By", modified_by)
