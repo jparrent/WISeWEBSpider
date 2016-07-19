@@ -19,6 +19,6 @@ python3.5 -m wisewebspider
 
 ### Dependencies and Credits
 
-* [Mechanize](http://wwwsearch.sourceforge.net/mechanize/)
+* [Mechanical Soup](http://mechanicalsoup.readthedocs.io/en/latest/)
 * [Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/)
 * Thank you to Ryan Mitchell, author of [Web Scraping with Python](http://pythonscraping.com/node/5)
