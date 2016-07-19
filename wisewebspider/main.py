@@ -180,6 +180,7 @@ def main():
     for item in SN_list_tags:
         SNname = item.get_text()
 
+        #update option goes here
         if args.update:
             if os.path.exists(_PATH + _DIR_WISEREP + SNname):
                 print('Skipping ' + SNname +
