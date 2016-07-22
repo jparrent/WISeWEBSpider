@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 """
 ===============================================================================
@@ -6,40 +6,28 @@ title           :main.py for wisewebspider package
 description     :Scrapes and downloads all publicly availabe spectra from
                  WISeREP.
 authors          :Jerod Parrent, James Guillochon
-date            :2016-07-16
-version         :0.2
-usage           :python3.5 -m wiserepspider
+date            :2016-07-21
+version         :0.3
+usage           :python3.5 -m wiserepspider (--update --daysago 30)
 notes           :runtime with pages saved and no exlusions = 18.7 hours
+                :runtime after initial scrape and update =< minutes
 python_version  :3.5.2
 ===============================================================================
-
-TO-DO, refactor to:
-items.py
-pipelines.py
-settings.py
-wiseweb-spider.py
-
-and functions:
-getObjHeader(), etc
-
-and Python3
 """
-
+ 
 import argparse
-import json  # pickle
+import sys
+import shutil
+import json
 import os
 import re
 import time
 import unicodedata
 from collections import OrderedDict
 from copy import deepcopy
-from http.cookiejar import CookieJar
 from urllib.parse import quote
 from urllib.request import Request, urlopen
-
-import mechanicalsoup
-import requests
-from bs4 import BeautifulSoup
+from robobrowser import RoboBrowser
 
 # reload(sys) #uncouth
 # not needed for python 3
@@ -101,8 +89,6 @@ exclude_program = [
     'HIRES'
 ]
 
-# exclude_program = ['HIRES']
-
 # dig up lists of known non-supernovae and completed events, or create if
 # it does not exist
 if os.path.exists(_PATH + _DIR_INTERNAL + 'lists.json'):
@@ -114,78 +100,80 @@ else:
         'completed': []
     }
 
-# #uncomment to re-initialize
-# list_dict['completed'] = []
-# list_dict['non_SN'] = []
+    with open(_PATH + _DIR_INTERNAL + 'lists.json', 'w') as fp:
+        json.dump(list_dict, fp, indent=4)
 
-# locate objects search form
-
-
-def select_obj_form(form):
-    return form.attrs.get('action', None) == '/objects/list'
-
-
+# make SN directory if it does not exist
 def mkSNdir(SNname):
     if not os.path.exists(_PATH + _DIR_WISEREP + SNname):
         os.mkdir(_PATH + _DIR_WISEREP + SNname)
 
+
+def rmSNdir(SNname):
+    if os.path.exists(_PATH + _DIR_WISEREP + SNname):
+        print('\tRemoving', SNname, 'directory tree to update files')
+        shutil.rmtree(_PATH + _DIR_WISEREP + SNname)
+
 # update lists.json
-
-
-def updateListsJson(SNname, dict):
-    dict.append(SNname)
+def updateListsJson(SNname, dict_list):
+    dict_list.append(SNname)
     with open(_PATH + _DIR_INTERNAL + 'lists.json', 'w') as fp:
         json.dump(list_dict, fp, indent=4)
 
-
-def savePage(name, page):
-    with open(_PATH + _DIR_INTERNAL + 'WISEREP-' + name + '.html', 'w') as f:
-        f.write(page)
-        f.close()
-
-
 def main():
+
+    # begin scraping
+    start_time = time.time()
+
     parser = argparse.ArgumentParser(prog='wisewebspider',
                                      description='WISeWEB-spider')
     parser.add_argument('--update', '-u', dest='update',
                         help='Run spider in update mode',
                         default=False, action='store_true')
+    parser.add_argument('--daysago', '-d', dest='daysago',
+                        help='Number of days since last update.'
+                        + 'Set to 1, 2, 7, 14, 30, 180, or 365.',
+                        default=False, action='store')
     args = parser.parse_args()
 
-    # begin scraping
-    start_time = time.time()
+    browser = RoboBrowser(history=True, parser='lxml')
+    browser.open(_WISEREP_OBJECTS_URL)
+    form = browser.get_form(action='/objects/list')
 
-    r = requests.get(_WISEREP_OBJECTS_URL)
-    soup = BeautifulSoup(r.content, "lxml")
-    if r:
+    # ready search form with field entries to submit, depending on --update
+    if browser and args.update:
+        # set "Added within the last args.daysago days"
+        print('Collecting new spectra from the last', args.daysago, 'days')
+
+        form['daysago'] = args.daysago
+        browser.submit_form(form)
+
+        try:
+            new_objs = (browser.find("tr", {"style": "font-weight:bold"})
+                        .parent.findChildren("tr", {"valign": "top"}))
+        except AttributeError:
+            sys.exit('Nothing to collect since ' + args.daysago + ' days ago')
+
+        new_objs = (browser.find("tr", {"style": "font-weight:bold"})
+                    .parent.findChildren("tr", {"valign": "top"}))
+
+        SN_list_tags = []
+
+        for obj in new_objs:
+            obj_name_tag = obj.find("a", {"title": "Click to show/update"})
+            SN_list_tags.append(obj_name_tag)
+
+        SN_list_tags = [i for i in SN_list_tags if i != None]
+
+    elif browser and args.update == False:
+        # grab object name list, and remove `Select Option' from list [1:]
         print('Grabbing list of events from WISeREP')
-
-    # grab object name list
-    SN_list_tags = soup.find("select", {"name": "objid"}).find_all("option")[
-        1:]  # remove `Select Option' from list
+        SN_list_tags = browser.find(
+            "select", {"name": "objid"}).find_all("option")[1:]
 
     # Begin by selecting event, visiting page, and scraping.
-    # SNname_list = ['SN2012fr', 'SN2016com']
-    # for SNname in SNname_list:
-
-    # Browser
-    br = mechanicalsoup.Browser(soup_config={"features": "lxml"})
-
-    search_page = br.get(_WISEREP_OBJECTS_URL)
-
-    # ready search form with field entries and submit
-    search_form = search_page.soup.find("form", {"action": "/objects/list"})
-    search_form.find("input", {"name": "rowslimit"})["value"] = '1000'
-
     for item in SN_list_tags:
         SNname = item.get_text()
-
-        #update option goes here
-        if args.update:
-            if os.path.exists(_PATH + _DIR_WISEREP + SNname):
-                print('Skipping ' + SNname +
-                      ', in update mode and folder already exists.')
-                continue
 
         if SNname in list_dict['non_SN']:
             print(SNname, 'is not a supernova -- Skipping')
@@ -199,25 +187,31 @@ def main():
         # reset for every event -- change if needed
         SN_dict = {}
 
-        search_form.find("input", {"name": "name"})["value"] = SNname
+        # if in update mode and SNname directory exists, remove it
+        if args.update:
+            rmSNdir(SNname)
 
-        # results page
-        results_response = br.submit(search_form, _WISEREP_OBJECTS_URL)
-        results_soup = results_response.soup
-        results_page = results_soup.get_text()
+        # set Obj Name to SNname and retrieve results page
+        form['name'] = SNname
+        browser.submit_form(form)
         print('\tPage received')
 
         # locate object header indecies (_idx)
         try:
-            headers = results_soup.find(
+            headers = browser.find(
                 "tr", {"style": "font-weight:bold"}).findChildren("td")
         except AttributeError:
-            updateListsJson(SNname, list_dict['completed'])
-            print('\t', SNname, 'has no available spectra')
-            with open(_PATH + _DIR_WISEREP + 'scraper-log.txt', 'a') as f:
-                f.write('From statement 1: ' + SNname +
-                        ' has no spectra to collect' + '\n')
-                f.close()
+            if args.update:
+                updateListsJson(SNname, list_dict['completed'])
+                print('\t', 'No spectra to collect')
+                break
+            else:
+                updateListsJson(SNname, list_dict['completed'])
+                print('\t', SNname, 'has no available spectra')
+                with open(_PATH + _DIR_WISEREP + 'scraper-log.txt', 'a') as f:
+                    f.write('From statement 1: ' + SNname +
+                            ' has no spectra to collect' + '\n')
+                    f.close()
             continue
 
         for i, header in enumerate(headers):
@@ -233,8 +227,11 @@ def main():
                 num_total_spec_idx = i
 
         # locate objects returned -- it's not always one
-        obj_list = results_soup.findAll("form", {"target": "new"})
+        obj_list = browser.find_all("form", {"target": "new"})
         num_objs = len(obj_list)
+
+        if num_objs >= 1 and args.update:
+            print('\tNew data available for', num_objs, 'objects.')
         if num_objs != 1:
             with open(_PATH + _DIR_WISEREP + 'scraper-log.txt', 'a') as f:
                 f.write(str(num_objs) + ' objects returned for ' + SNname + '\n')
@@ -242,8 +239,8 @@ def main():
 
         # locate darkred text ``Potential matching IAU-Name'' if it exists
         # the location of html table rows (tr) changes if it exists
-        darkred = results_soup.find("span", text=" Potential matching IAU-Name/s:",
-                                    attrs={"style": "color:darkred; font-size:small"})
+        darkred = browser.find("span", text=" Potential matching IAU-Name/s:",
+                               attrs={"style": "color:darkred; font-size:small"})
 
         # parse obj_list, match to SNname, and find its spectra
         for obj in obj_list:
@@ -253,6 +250,7 @@ def main():
             if SNname == obj_name:
                 target = obj_header
 
+                # this checks for spurious page element that changes layout
                 if darkred:
                     try:
                         target_spectra = (obj.parent.nextSibling.nextSibling
@@ -274,7 +272,7 @@ def main():
                         print('\t', SNname, 'has no spectra to collect')
                         with open(_PATH + _DIR_WISEREP +
                                   'scraper-log.txt', 'a') as f:
-                            f.write('From statement 2: ' + SNname +
+                            f.write('From statement 3: ' + SNname +
                                     ' has no spectra to collect' + '\n')
                             f.close()
                         continue
@@ -292,12 +290,16 @@ def main():
 
         elif SNtype == '':
             # SNtype = 'Unspecified by WISeREP'
-            print(
-                '\tType not specified by WISeREP -- check the Open Supernova Catalog for type')
+            print('\tType not specified by WISeREP.',
+                  'Check the Open Supernova Catalog for type.')
             with open(_PATH + _DIR_WISEREP + 'scraper-log.txt', 'a') as f:
-                f.write(
-                    'Type not specified by WISeREP -- check the Open Supernova Catalog for type')
+                f.write('Type not specified by WISeREP.' +
+                        'Check the Open Supernova Catalog for type.')
                 f.close()
+
+        # create a directory even if the SN event has no spectra.
+        # find other instances of mkSNdir to revert this.
+        mkSNdir(SNname)
 
         # second chance to exclude events without spectra
         num_total_spec = target[num_total_spec_idx].text
@@ -306,22 +308,21 @@ def main():
             updateListsJson(SNname, list_dict['completed'])
             print('\t', SNname, 'has no spectra to collect')
             with open(_PATH + _DIR_WISEREP + 'scraper-log.txt', 'a') as f:
-                f.write('From statement 3: ' + SNname +
+                f.write('From statement 4: ' + SNname +
                         ' has no spectra to collect' + '\n')
                 f.close()
             continue
 
         redshift = target[redshift_idx].text
-        # z = target[redshift_idx].text
-        # redshift = 'Unavailable' if z==u'' else z
 
         SN_dict[SNname] = OrderedDict()
+
         # number of private spectra
         num_private_spectra = 0
         # number of publicly available spectra
         num_pub_spectra = 0
 
-        spec_header = results_soup.find(
+        spec_header = browser.find(
             "tr", {"style": "color:black; font-size:x-small"}).findChildren("td")
         for i, header in enumerate(spec_header):
             if header.text == 'Spec. Prog.':
@@ -443,7 +444,6 @@ def main():
 
         elif num_pub_spectra == 0:
             updateListsJson(SNname, list_dict['completed'])
-            savePage(SNname, results_page)
             print('\tAll spectra for', SNname, 'are still private')
             with open(_PATH + _DIR_WISEREP + 'private-spectra-log.txt', 'a') as f:
                 f.write('All spectra for ' + SNname + ' are still private\n')
@@ -457,7 +457,6 @@ def main():
                         SNname + ' at this time' + '\n')
                 f.close()
             updateListsJson(SNname, list_dict['completed'])
-            savePage(SNname, results_page)
 
         elif len(spectrum_haul) == 1:
 
@@ -465,7 +464,7 @@ def main():
 
             # make SNname subdirectory
             # os.mkdir(_PATH+_DIR_WISEREP+SNname)
-            mkSNdir(SNname)
+            # mkSNdir(SNname)
 
             for filename, url in spectrum_haul.items():
                 rq = Request(url)
@@ -477,25 +476,16 @@ def main():
 
             # add README for basic metadata to SNname subdirectory
             print('\tWriting README')
-
-            # f = open(_PATH+_DIR_WISEREP+SNname+'/README.txt','wb')
-            # for file in SN_dict[SNname].keys():
-            #     f.write(file+'\n')
-            #     for key in SN_dict[SNname][file].keys():
-            #         f.write('\t' + '%-*s  %s' % (20, key + ':', SN_dict[SNname][file][key]) + '\n')
-            # f.close()
-
             with open(_PATH + _DIR_WISEREP + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
 
             updateListsJson(SNname, list_dict['completed'])
-            savePage(SNname, results_page)
 
         elif len(spectrum_haul) > 1:
 
             # make SNname subdirectory
             # os.mkdir(_PATH+_DIR_WISEREP+SNname)
-            mkSNdir(SNname)
+            # mkSNdir(SNname)
 
             SN_files = deepcopy(SN_dict[SNname]).items()
             for filename, metadata in SN_files:
@@ -564,19 +554,15 @@ def main():
 
             # add README for basic metadata to SNname subdirectory
             print('\tWriting README')
-
-            # f = open(_PATH+_DIR_WISEREP+SNname+'/README.txt','wb')
-            # for file in SN_dict[SNname].keys():
-            #     f.write(file+'\n')
-            #     for key in SN_dict[SNname][file].keys():
-            #         f.write('\t' + '%-*s  %s' % (20, key + ':', SN_dict[SNname][file][key]) + '\n')
-            # f.close()
-
             with open(_PATH + _DIR_WISEREP + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
 
             updateListsJson(SNname, list_dict['completed'])
-            savePage(SNname, results_page)
+
+    # reset completed to 0 once all done
+    list_dict['completed'] = []
+    with open(_PATH + _DIR_INTERNAL + 'lists.json', 'w') as fp:
+        json.dump(list_dict, fp, indent=4)
 
     # execution time in minutes
     minutes = (time.time() - start_time) / 60.0
@@ -584,7 +570,3 @@ def main():
     with open(_PATH + _DIR_WISEREP + 'scraper-log.txt', 'a') as f:
         f.write('Runtime: ' + str(minutes) + ' minutes')
         f.close()
-
-    # reset completed to 0 once all done
-    list_dict['completed'] = []
-    updateListsJson(SNname, list_dict['completed'])
