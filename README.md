@@ -1,4 +1,4 @@
-## WISeWEB-Spider version 0.3
+## WISeWEBSpider version 0.3
 Original Authors: Jerod Parrent, James Guillochon
 
 ###Description
