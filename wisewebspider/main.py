@@ -97,9 +97,9 @@ def rmSNdir(SNname, path):
 
 
 # update lists.json
-def updateListsJson(SNname, dict_list, list_dict):
+def updateListsJson(SNname, dict_list, list_dict, path):
     dict_list.append(SNname)
-    with open(_PATH + _DIR_WISEREP + 'lists.json', 'w') as fp:
+    with open(_PATH + path + 'lists.json', 'w') as fp:
         json.dump(list_dict, fp, indent=4)
 
 
@@ -211,11 +211,11 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                 "tr", {"style": "font-weight:bold"}).findChildren("td")
         except AttributeError:
             if update:
-                updateListsJson(SNname, list_dict['completed'], list_dict)
+                updateListsJson(SNname, list_dict['completed'], list_dict, path)
                 print('\t', 'No spectra to collect')
                 break
             else:
-                updateListsJson(SNname, list_dict['completed'], list_dict)
+                updateListsJson(SNname, list_dict['completed'], list_dict, path)
                 print('\t', SNname, 'has no available spectra')
                 with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                     f.write('From statement 1: ' + SNname +
@@ -289,8 +289,8 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
         # exclude non-SN
         SNtype = target[type_idx].text
         if SNtype in exclude_type:
-            updateListsJson(SNname, list_dict['non_SN'], list_dict)
-            updateListsJson(SNname, list_dict['completed'], list_dict)
+            updateListsJson(SNname, list_dict['non_SN'], list_dict, path)
+            updateListsJson(SNname, list_dict['completed'], list_dict, path)
             print('\t', SNname, 'is a', SNtype)
             with open(_PATH + path + 'non-supernovae.txt', 'a') as f:
                 f.write(SNname + ' is a ' + SNtype + '\n')
@@ -314,7 +314,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
         num_total_spec = target[num_total_spec_idx].text
         num_total_spec = unicodedata.normalize("NFKD", num_total_spec)
         if num_total_spec == u'  ' or num_total_spec == u' 0 ':
-            updateListsJson(SNname, list_dict['completed'], list_dict)
+            updateListsJson(SNname, list_dict['completed'], list_dict, path)
             print('\t', SNname, 'has no spectra to collect')
             with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                 f.write('From statement 4: ' + SNname +
@@ -452,7 +452,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                 f.close()
 
         elif num_pub_spectra == 0:
-            updateListsJson(SNname, list_dict['completed'], list_dict)
+            updateListsJson(SNname, list_dict['completed'], list_dict, path)
             print('\tAll spectra for', SNname, 'are still private')
             with open(_PATH + path + 'private-spectra-log.txt', 'a') as f:
                 f.write('All spectra for ' + SNname + ' are still private\n')
@@ -465,7 +465,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                 f.write('Not collecting spectra of ' +
                         SNname + ' at this time' + '\n')
                 f.close()
-            updateListsJson(SNname, list_dict['completed'], list_dict)
+            updateListsJson(SNname, list_dict['completed'], list_dict, path)
 
         elif len(spectrum_haul) == 1:
 
@@ -488,7 +488,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             with open(_PATH + path + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
 
-            updateListsJson(SNname, list_dict['completed'], list_dict)
+            updateListsJson(SNname, list_dict['completed'], list_dict, path)
 
         elif len(spectrum_haul) > 1:
 
@@ -566,7 +566,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             with open(_PATH + path + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
 
-            updateListsJson(SNname, list_dict['completed'], list_dict)
+            updateListsJson(SNname, list_dict['completed'], list_dict, path)
 
     # reset completed to 0 once all done
     list_dict['completed'] = []
