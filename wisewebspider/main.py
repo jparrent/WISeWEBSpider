@@ -161,7 +161,8 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             new_objs = (browser.find("tr", {"style": "font-weight:bold"})
                         .parent.findChildren("tr", {"valign": "top"}))
         except AttributeError:
-            sys.exit('Nothing to collect since ' + daysstr + ' days ago')
+            print('Nothing to collect since ' + daysstr + ' days ago')
+            return
 
         new_objs = (browser.find("tr", {"style": "font-weight:bold"})
                     .parent.findChildren("tr", {"valign": "top"}))
