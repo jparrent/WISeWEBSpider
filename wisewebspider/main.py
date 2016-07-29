@@ -6,8 +6,8 @@ title           :main.py for wisewebspider package
 description     :Scrapes and downloads all publicly availabe spectra from
                  WISeREP.
 authors          :Jerod Parrent, James Guillochon
-date            :2016-07-21
-version         :0.3
+date            :2016-07-28
+version         :0.4
 usage           :python3.5 -m wiserepspider (--update --daysago 30)
 notes           :runtime with pages saved and no exlusions = 18.7 hours
                 :runtime after initial scrape and update =< minutes
@@ -20,7 +20,6 @@ import json
 import os
 import re
 import shutil
-import sys
 import time
 import unicodedata
 from collections import OrderedDict
@@ -29,10 +28,6 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 from robobrowser import RoboBrowser
-
-# reload(sys) #uncouth
-# not needed for python 3
-# sys.setdefaultencoding('utf8') #uncouth
 
 _DIR_WISEREP = "/../sne-external-WISEREP/"
 
@@ -44,6 +39,7 @@ _ASCII_URL = "\.(flm|dat|asc|asci|ascii|txt|sp|spec)$"
 
 # WISeREP Objects Home
 _WISEREP_OBJECTS_URL = 'http://wiserep.weizmann.ac.il/objects/list'
+_WISEREP_SPECTRA_URL = 'http://wiserep.weizmann.ac.il/spectra/list'
 
 # list of non-supernovae to exclude
 exclude_type = [
@@ -105,17 +101,17 @@ def updateListsJson(SNname, dict_list, list_dict, path):
 
 def main():
     parser = argparse.ArgumentParser(prog='wisewebspider',
-                                     description='WISeWEB-spider')
+                                     description='WISeWEBspider')
     parser.add_argument('--update', '-u', dest='update',
                         help='Run spider in update mode',
                         default=False, action='store_true')
     parser.add_argument('--daysago', '-d', dest='daysago',
-                        help='Number of days since last update.'
-                        + 'Set to 1, 2, 7, 14, 30, 180, or 365.',
+                        help='Number of days since last update.' +
+                        'Set to 1, 2, 7, 14, 30, 180, or 365.',
                         default=False, action='store')
     parser.add_argument('--path', '-p', dest='path',
-                        help='Path to sne-external-WISEREP directory. '
-                        + 'Default: Within main WISeWEBSpider directory.',
+                        help='Path to sne-external-WISEREP directory. ' +
+                        'Default: Within main WISeWEBSpider directory.',
                         default=_DIR_WISEREP, type=str, action='store')
     args = parser.parse_args()
 
@@ -123,6 +119,8 @@ def main():
 
 
 def spider(update=False, daysago=30, path=_DIR_WISEREP):
+    start_time = time.time()
+
     if not os.path.exists(_PATH + path):
         os.mkdir(_PATH + path)
 
@@ -140,10 +138,62 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
         with open(_PATH + path + 'lists.json', 'w') as fp:
             json.dump(list_dict, fp, indent=4)
 
-    # make SN directory if it does not exist
+    # collect metadata for the few available host spectra and
+    # build a dictionary that will be used below to
+    # remove by SNname and "Spectrum Type"
+    browser = RoboBrowser(history=True, parser='lxml')
+    browser.open(_WISEREP_SPECTRA_URL)
+    form = browser.get_form(action='/spectra/list')
+    form['spectypeid'] = "2"           # 2 for Host spectrum
+    form['rowslimit'] = "10000"
+    browser.submit_form(form)
+    print('\tHost page received')
 
-    # begin scraping
-    start_time = time.time()
+    obj_host_dict = {}
+    obj_host_headers = (browser.find("tr", {"style": "font-weight:bold"})
+                        .findChildren("td"))
+
+    for i, header in enumerate(obj_host_headers):
+        # if header.text == 'Obj. Name':
+        #     host_obj_name_idx = i
+        if header.text == 'Spec.Program':
+            host_program_idx = i
+        if header.text == 'Instrument':
+            host_instrument_idx = i
+        if header.text == 'Observer':
+            host_observer_idx = i
+        if header.text == 'Obs. Date':
+            host_obsdate_idx = i
+        if header.text == 'Reducer':
+            host_reducer_idx = i
+        if header.text == 'Ascii FileFits  File':
+            host_filename_idx = i
+
+    obj_host_list = browser.find_all("a", {"title": "Click to show/update object"})
+
+    for i, obj in enumerate(obj_host_list):
+        print('\tParsing', i+1, 'of', len(obj_host_list), 'host spectra')
+        obj_name = obj.text
+        host_children = obj.parent.parent.findChildren("td")
+        host_program = host_children[host_program_idx].text
+        host_instrument = host_children[host_instrument_idx].text
+        host_observer = host_children[host_observer_idx].text
+        host_obsdate = host_children[host_obsdate_idx].text
+        host_reducer = host_children[host_reducer_idx].text
+        host_filename = host_children[host_filename_idx].text
+        host_filename = host_filename.strip().split('\n')[0]
+
+        obj_host_dict[obj_name] = OrderedDict([
+            ("Type", "Host spectrum"),
+            ("Filename", host_filename),
+            ("Obs. Date", host_obsdate),
+            ("Program", host_program),
+            ("Instrument", host_instrument),
+            ("Observer", host_observer),
+            ("Reducer", host_reducer),
+        ])
+
+    # begin scraping WISeREP OBJECTS page for supernovae
     browser = RoboBrowser(history=True, parser='lxml')
     browser.open(_WISEREP_OBJECTS_URL)
     form = browser.get_form(action='/objects/list')
@@ -173,7 +223,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             obj_name_tag = obj.find("a", {"title": "Click to show/update"})
             SN_list_tags.append(obj_name_tag)
 
-        SN_list_tags = [i for i in SN_list_tags if i != None]
+        SN_list_tags = [i for i in SN_list_tags if i is not None]
 
     elif browser and not update:
         # grab object name list, and remove `Select Option' from list [1:]
@@ -184,6 +234,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
     # Begin by selecting event, visiting page, and scraping.
     for item in SN_list_tags:
         SNname = item.get_text()
+        # SNname = 'SNLS05D2bk'
 
         if SNname in list_dict['non_SN']:
             print(SNname, 'is not a supernova -- Skipping')
@@ -356,8 +407,8 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             if header.text == 'Modified-by':
                 modified_by_idx = i
 
-        # build SN_dict and locate ascii files on search results page associated
-        # with SNname
+        # build SN_dict and locate ascii files on search results page
+        # associated with SNname
         spectrum_haul = OrderedDict()
 
         for spec in target_spectra:
@@ -445,6 +496,12 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             spectrum_haul[filename] = dat_url
             num_pub_spectra += 1
 
+        SN_dict[SNname]['Private Spectra'] = str(num_private_spectra)
+
+        # Metadata for SNname is now available.
+        # The following filters cases by the number of
+        # spectra that appear on the WISeREP page.
+
         if num_private_spectra > 0 and num_pub_spectra != 0:
             print('\tHit', num_private_spectra, 'private spectra for', SNname)
             with open(_PATH + path + 'private-spectra-log.txt', 'a') as f:
@@ -453,11 +510,16 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                 f.close()
 
         elif num_pub_spectra == 0:
-            updateListsJson(SNname, list_dict['completed'], list_dict, path)
             print('\tAll spectra for', SNname, 'are still private')
             with open(_PATH + path + 'private-spectra-log.txt', 'a') as f:
                 f.write('All spectra for ' + SNname + ' are still private\n')
                 f.close()
+
+            with open(_PATH + path + SNname + '/README.json', 'w') as fp:
+                json.dump(SN_dict[SNname], fp, indent=4)
+                fp.close()
+
+            updateListsJson(SNname, list_dict['completed'], list_dict, path)
             continue
 
         if len(spectrum_haul) == 0:
@@ -466,9 +528,32 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                 f.write('Not collecting spectra of ' +
                         SNname + ' at this time' + '\n')
                 f.close()
+
+            with open(_PATH + path + SNname + '/README.json', 'w') as fp:
+                json.dump(SN_dict[SNname], fp, indent=4)
+                fp.close()
+
             updateListsJson(SNname, list_dict['completed'], list_dict, path)
+            continue
 
         elif len(spectrum_haul) == 1:
+
+            # remove host spectrum if it exists
+            if SNname in obj_host_dict.keys():
+                if obj_host_dict[SNname]['Filename'] in SN_dict[SNname].keys():
+                    filename = obj_host_dict[SNname]['Filename']
+                    del SN_dict[SNname][filename]
+
+                    print('\tPurging host galaxy spectrum --', filename)
+
+                print('\tNot collecting spectra at this time')
+                with open(_PATH + path + 'scraper-log.txt', 'a') as f:
+                    f.write('Not collecting spectra of ' +
+                            SNname + ' at this time' + '\n')
+                    f.close()
+
+                updateListsJson(SNname, list_dict['completed'], list_dict, path)
+                continue
 
             print('\tDownloading 1 public spectrum')
 
@@ -488,6 +573,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             print('\tWriting README')
             with open(_PATH + path + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
+                fp.close()
 
             updateListsJson(SNname, list_dict['completed'], list_dict, path)
 
@@ -497,8 +583,9 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             # os.mkdir(_PATH+path+SNname)
             # mkSNdir(SNname, path)
 
-            SN_files = deepcopy(SN_dict[SNname]).items()
-            for filename, metadata in SN_files:
+            SN_files = deepcopy(SN_dict[SNname])
+            del SN_files["Private Spectra"]
+            for filename, metadata in SN_files.items():
                 if metadata['Reduction Status'] == 'rapid':
                     del SN_dict[SNname][filename]
                     del spectrum_haul[filename]
@@ -510,21 +597,40 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                                 SNname + ' -- ' + filename + '\n')
                         f.close()
 
+            # remove host spectrum if it exists
+            if SNname in obj_host_dict.keys():
+                if obj_host_dict[SNname]['Filename'] in SN_dict[SNname].keys():
+                    filename = obj_host_dict[SNname]['Filename']
+                    del SN_dict[SNname][filename]
+
+                    print('\tPurging host galaxy spectrum --', filename)
+
+            # need to continue to next supernova if host spectrum was only one
+            if len(SN_dict[SNname].keys()) == 0:
+                print('\tNot collecting spectra at this time')
+                with open(_PATH + path + 'scraper-log.txt', 'a') as f:
+                    f.write('Not collecting spectra of ' +
+                            SNname + ' at this time' + '\n')
+                    f.close()
+                updateListsJson(SNname, list_dict['completed'], list_dict, path)
+                continue
+
             last_modified = {}
-            SN_files = SN_dict[SNname].items()
-            for k, d in SN_files:
-                for l, e in SN_files:
+            SN_files = deepcopy(SN_dict[SNname])
+            del SN_files["Private Spectra"]
+            for k, d in SN_files.items():
+                for l, e in SN_files.items():
                     aa = d['Obs. Date'] == e['Obs. Date']
                     bb = d['Instrument'] == e['Instrument']
                     cc = d['Observer'] == e['Observer']
                     dd = d['Modified By'] == 'ofer-UploadSet'
                     ee = d['Modified By'] == e['Modified By']
-                    if aa and bb and cc and dd and ee and k != l:  # 2012fs case
+                    if aa and bb and cc and dd and ee and k != l:  # see 2012fs
                         date = SN_dict[SNname][k]['Last Modified']
                         newdate = time.strptime(date, '%Y-%m-%d')
                         last_modified[k] = newdate
 
-                    elif aa and bb and cc and k != l:  # 2016bau case
+                    elif aa and bb and cc and k != l:  # see 2016bau
                         date = SN_dict[SNname][k]['Last Modified']
                         newdate = time.strptime(date, '%Y-%m-%d')
                         last_modified[k] = newdate
@@ -566,6 +672,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             print('\tWriting README')
             with open(_PATH + path + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
+                fp.close()
 
             updateListsJson(SNname, list_dict['completed'], list_dict, path)
 
@@ -573,6 +680,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
     list_dict['completed'] = []
     with open(_PATH + path + 'lists.json', 'w') as fp:
         json.dump(list_dict, fp, indent=4)
+        fp.close()
 
     # execution time in minutes
     minutes = (time.time() - start_time) / 60.0
