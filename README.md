@@ -1,8 +1,8 @@
-## WISeWEBSpider version 0.3
+## WISeWEBSpider version 0.4
 Original Authors: Jerod Parrent, James Guillochon
 
 ###Description
-`wisewebspider` is a simple program built to scrape and download all publicly available supernova spectra from the [Weizmann Interactive Supernova data REPository (WISeREP)](http://wiserep.weizmann.ac.il); a bulk download option is not available through WISeREP and the number of supernova spectra to download are in the 10,000s. The script creates two main directories, `sne-external-WISEREP/` and `sne-internal/`. Within `sne-external-WISEREP/`, spectra are stored in individual subdirectories alongside `README.json` files. The README files detail event metadata for each spectrum collected. Stored in `sne-internal/` are log files and pickles to keep track of the scripts progress, as well as non-supernova events to save time. 
+`wisewebspider` is a simple program built to scrape and download all publicly available supernova spectra from the [Weizmann Interactive Supernova data REPository (WISeREP)](http://wiserep.weizmann.ac.il); a bulk download option is not available through WISeREP and the number of supernova spectra to download are in the 10,000s. The script creates one main directories, `sne-external-WISEREP/`, where spectra are stored in individual subdirectories alongside `README.json` files. The README files detail event metadata for each spectrum collected and keep track of the number of private spectra. Also stored in `sne-external-WISEREP/` are log files and a `lists.json` file to keep track of the scripts progress, as well as non-supernova events to save time. 
 
 The script guards against spectra already collected, duplicate files found on WISeREP, and events that are not supernovae. However, no effort has been made to collate spectra for objects with multiple aliases (e.g., SN2011fe and PTF11kly, both the same event, have separate directories), nor does the script determine supernova types for objects that are unspecified on WISeREP.
 
