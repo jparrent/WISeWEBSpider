@@ -294,6 +294,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             attrs={"style": "color:darkred; font-size:small"})
 
         # parse obj_list, match to SNname, and find its spectra
+        target = ''
         for obj in obj_list:
             obj_header = obj.parent.findChildren("td")
             obj_name = obj_header[obj_name_idx].text
@@ -326,6 +327,9 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                                     ' has no spectra to collect' + '\n')
                             f.close()
                         continue
+        # No match found, skip this event
+        if not target:
+            continue
 
         # exclude non-SN
         SNtype = target[type_idx].text
