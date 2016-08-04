@@ -371,10 +371,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
 
         SN_dict[SNname] = OrderedDict()
 
-        # // TODO: remove depricated private variables
-        # number of private spectra
-        # num_private_spectra = 0
-
         # number of publicly available spectra
         num_pub_spectra = 0
 
@@ -411,14 +407,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
 
             spec_link = spec.find("a", href=re.compile(_ASCII_URL))
             dat_url = quote(spec_link.attrs['href'], "http://")
-
-            # // TODO: remove depricated private variables
-            # try:
-            #     dat_url = quote(spec_link.attrs['href'], "http://")
-            # except AttributeError:
-            #     # found private spectrum
-            #     num_private_spectra += 1
-            #     continue
 
             children = spec.findChildren("td")
             filename = spec_link.text
@@ -473,33 +461,9 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             spectrum_haul[filename] = dat_url
             num_pub_spectra += 1
 
-        # // TODO: remove depricated private variables
-        # SN_dict[SNname]['Private Spectra'] = str(num_private_spectra)
-
         # Metadata for SNname is now available.
         # The following filters cases by the number of
         # spectra that appear on the WISeREP page.
-
-        # // TODO: remove depricated private variables
-        # if num_private_spectra > 0 and num_pub_spectra != 0:
-        #     print('\tHit', num_private_spectra, 'private spectra for', SNname)
-        #     with open(_PATH + path + 'private-spectra-log.txt', 'a') as f:
-        #         f.write(SNname + ' has ' + str(num_private_spectra) +
-        #                 ' private spectra\n')
-        #         f.close()
-        #
-        # elif num_pub_spectra == 0:
-        #     print('\tAll spectra for', SNname, 'are still private')
-        #     with open(_PATH + path + 'private-spectra-log.txt', 'a') as f:
-        #         f.write('All spectra for ' + SNname + ' are still private\n')
-        #         f.close()
-        #
-        #     with open(_PATH + path + SNname + '/README.json', 'w') as fp:
-        #         json.dump(SN_dict[SNname], fp, indent=4)
-        #         fp.close()
-        #
-        #     updateListsJson(SNname, list_dict['completed'], list_dict, path)
-        #     continue
 
         if len(spectrum_haul) == 0:
             print('\tNot collecting spectra at this time')
@@ -563,8 +527,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             # mkSNdir(SNname, path)
 
             SN_files = deepcopy(SN_dict[SNname])
-            # // TODO: remove depricated private variables
-            # del SN_files["Private Spectra"]
             for filename, metadata in SN_files.items():
                 if metadata['Reduction Status'] == 'rapid':
                     del SN_dict[SNname][filename]
@@ -598,8 +560,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
 
             last_modified = {}
             SN_files = deepcopy(SN_dict[SNname])
-            # // TODO: remove depricated private variables
-            # del SN_files["Private Spectra"]
             for k, d in SN_files.items():
                 for l, e in SN_files.items():
                     aa = d['Obs. Date'] == e['Obs. Date']
