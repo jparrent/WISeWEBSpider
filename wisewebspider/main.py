@@ -5,7 +5,7 @@ title           :main.py for wisewebspider package
 description     :Scrapes and downloads all publicly availabe spectra from
                  WISeREP.
 authors          :Jerod Parrent, James Guillochon
-date            :2016-07-28
+date            :2016-08-09
 version         :0.4
 usage           :python3.5 -m wiserepspider (--update --daysago 30)
 notes           :runtime with pages saved and no exlusions = 18.7 hours
@@ -103,6 +103,9 @@ def main():
     args = parser.parse_args()
 
     spider(update=args.update, daysago=args.daysago, path=args.path)
+
+    # for debugging
+    # spider(update=True, daysago=30, path=_DIR_WISEREP)
 
 
 def spider(update=False, daysago=30, path=_DIR_WISEREP):
@@ -217,9 +220,11 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                                     {"name": "objid"}).find_all("option")[1:]
 
     # Begin by selecting event, visiting page, and scraping.
+    # SN_list = ['SMT-DWF16bc']
+    # for item in SN_list:
     for item in SN_list_tags:
         SNname = item.get_text()
-        # SNname = 'SNLS05D2bk'
+        # SNname = item
 
         if SNname in list_dict['non_SN']:
             print(SNname, 'is not a supernova -- Skipping')
@@ -406,8 +411,10 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
         for spec in target_spectra:
 
             spec_link = spec.find("a", href=re.compile(_ASCII_URL))
-            dat_url = quote(spec_link.attrs['href'], "http://")
-
+            try:
+                dat_url = quote(spec_link.attrs['href'], "http://")
+            except AttributeError:  # handles a return of 'None'
+                continue
             children = spec.findChildren("td")
             filename = spec_link.text
             program = children[program_idx].text
