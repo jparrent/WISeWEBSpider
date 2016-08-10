@@ -6,9 +6,9 @@ install:
     - pip install -r requirements.txt
     - pip install coveralls
 # command to run tests
-script: 
-    - coverage run wisewebspider setup test
+script: nosetests
+#    - coverage run wisewebspider setup test
 
 # run coveralls
-after_success:
-    coveralls
+#after_success:
+#    coveralls
