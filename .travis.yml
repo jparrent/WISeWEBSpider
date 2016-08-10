@@ -7,7 +7,7 @@ install:
     - pip install coveralls
 # command to run tests
 script: 
-    - coverage run --souce=WISeWEBSpider setup.py test
+    - coverage run --source=WISeWEBSpider setup.py test
 
 # run coveralls
 after_success:
