@@ -34,7 +34,7 @@ _DIR_WISEREP = "/../sne-external-WISEREP/"
 _PATH = os.path.dirname(os.path.abspath(__file__))
 
 # used for locating filenames with only these extensions (no fits files)
-_ASCII_URL = "\.(flm|dat|asc|asci|ascii|txt|sp|spec)$"
+_ASCII_URL = "\.(flm|dat|asc|asci|ascii|txt|sp|spec|[0-9])$"
 
 # WISeREP Objects Home
 _WISEREP_OBJECTS_URL = 'http://wiserep.weizmann.ac.il/objects/list'
@@ -220,11 +220,11 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                                     {"name": "objid"}).find_all("option")[1:]
 
     # Begin by selecting event, visiting page, and scraping.
-    # SN_list = ['SMT-DWF16bc']
-    # for item in SN_list:
-    for item in SN_list_tags:
-        SNname = item.get_text()
-        # SNname = item
+    SN_list = ['SN2013fc']
+    for item in SN_list:
+        # for item in SN_list_tags:
+        #     SNname = item.get_text()
+        SNname = item
 
         if SNname in list_dict['non_SN']:
             print(SNname, 'is not a supernova -- Skipping')
