@@ -1,6 +1,5 @@
 ## WISeWEBSpider version 0.4
 [![Build Status](https://img.shields.io/travis/jparrent/WISeWEBSpider.svg)](https://travis-ci.org/jparrent/WISeWEBSpider)
-[![Coverage Status](https://coveralls.io/repos/github/jparrent/WISeWEBSpider/badge.svg?branch=master)](https://coveralls.io/github/jparrent/WISeWEBSpider?branch=master)
 [![Python Version](https://img.shields.io/badge/python-3.5-blue.svg)](https://www.python.org)
 
 Original Authors: Jerod Parrent, James Guillochon
