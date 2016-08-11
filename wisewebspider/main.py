@@ -220,11 +220,11 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                                     {"name": "objid"}).find_all("option")[1:]
 
     # Begin by selecting event, visiting page, and scraping.
-    SN_list = ['SN2013fc']
-    for item in SN_list:
-        # for item in SN_list_tags:
-        #     SNname = item.get_text()
-        SNname = item
+    # SN_list = ['SN2013fc']
+    # for item in SN_list:
+    for item in SN_list_tags:
+        SNname = item.get_text()
+        # SNname = item
 
         if SNname in list_dict['non_SN']:
             print(SNname, 'is not a supernova -- Skipping')
