@@ -7,8 +7,8 @@ install:
     - pip install coveralls
 # command to run tests
 script: nosetests
-#    - coverage run wisewebspider setup test
+    - coverage run wisewebspider test
 
 # run coveralls
-#after_success:
-#    coveralls
+after_success:
+    coveralls
