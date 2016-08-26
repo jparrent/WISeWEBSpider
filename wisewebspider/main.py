@@ -5,7 +5,7 @@ title           :main.py for wisewebspider package
 description     :Scrapes and downloads all publicly availabe spectra from
                  WISeREP.
 authors          :Jerod Parrent, James Guillochon
-date            :2016-08-09
+date            :2016-08-25
 version         :0.4
 usage           :python3.5 -m wiserepspider (--update --daysago 30)
 notes           :runtime with pages saved and no exlusions = 18.7 hours
@@ -53,6 +53,13 @@ exclude_program = [
     'HIRES', 'SUSPECT', 'BSNIP', 'CSP', 'UCB-SNDB', 'CfA-Ia', 'CfA-Ibc',
     'CfA-Stripped', 'SNfactory', 'HIRES'
 ]
+
+wiserep_spectrum_ignore = []
+
+with open('wiserep_spectrum_ignore.txt') as f:
+    for line in f:
+        line = line.rstrip()
+        wiserep_spectrum_ignore.append(line)
 
 
 def mkSNdir(SNname, path):
@@ -220,7 +227,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                                     {"name": "objid"}).find_all("option")[1:]
 
     # Begin by selecting event, visiting page, and scraping.
-    # SN_list = ['SN2013fc']
+    # SN_list = ['SN2009ip']
     # for item in SN_list:
     for item in SN_list_tags:
         SNname = item.get_text()
@@ -513,11 +520,16 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
             # mkSNdir(SNname, path)
 
             for filename, url in spectrum_haul.items():
-                rq = Request(url)
-                res = urlopen(rq)
-                dat = open(_PATH + path + SNname + "/" + filename, 'wb')
-                dat.write(res.read())
-                dat.close()
+                if filename in wiserep_spectrum_ignore:
+                    print('\tIgnoring spectrum for', SNname,
+                          '-- see sne-external-spectra/donations')
+                    continue
+                else:
+                    rq = Request(url)
+                    res = urlopen(rq)
+                    dat = open(_PATH + path + SNname + "/" + filename, 'wb')
+                    dat.write(res.read())
+                    dat.close()
 
             # add README for basic metadata to SNname subdirectory
             print('\tWriting README')
@@ -609,11 +621,16 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
                 print('\tDownloading', count, 'of', len(SN_dict[SNname]),
                       'public spectra')
 
-                rq = Request(url)
-                res = urlopen(rq)
-                dat = open(_PATH + path + SNname + "/" + filename, 'wb')
-                dat.write(res.read())
-                dat.close()
+                if filename in wiserep_spectrum_ignore:
+                    print('\tIgnoring spectrum for', SNname,
+                          '-- see sne-external-spectra/donations')
+                    continue
+                else:
+                    rq = Request(url)
+                    res = urlopen(rq)
+                    dat = open(_PATH + path + SNname + "/" + filename, 'wb')
+                    dat.write(res.read())
+                    dat.close()
 
                 count += 1
 
