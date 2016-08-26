@@ -56,7 +56,7 @@ exclude_program = [
 
 wiserep_spectrum_ignore = []
 
-with open(os.path.join(os.path.dirname(__file__), 'wiserep_spectrum_ignore.txt'), r) as f:
+with open(os.path.join(os.path.dirname(_PATH), 'wiserep_spectrum_ignore.txt'), 'r') as f:
     for line in f:
         line = line.rstrip()
         wiserep_spectrum_ignore.append(line)
