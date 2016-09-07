@@ -282,7 +282,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                 with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                     f.write('From statement 1: ' + SNname +
                             ' has no spectra to collect' + '\n')
-                    f.close()
             continue
 
         for i, header in enumerate(headers):
@@ -307,7 +306,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                 f.write(
                     str(num_objs) + ' objects returned for ' + SNname + '\n')
-                f.close()
 
         # locate darkred text ``Potential matching IAU-Name'' if it exists
         # the location of html table rows (tr) changes if it exists
@@ -336,7 +334,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                         with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                             f.write('From statement 2: ' + SNname +
                                     ' has no spectra to collect' + '\n')
-                            f.close()
                         continue
 
                 elif darkred is None:
@@ -348,7 +345,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                         with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                             f.write('From statement 3: ' + SNname +
                                     ' has no spectra to collect' + '\n')
-                            f.close()
                         continue
         # No match found, skip this event
         if not target:
@@ -362,7 +358,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             print('\t', SNname, 'is a', SNtype)
             with open(_PATH + path + 'non-' + incl_type_str + '.txt', 'a') as f:
                 f.write(SNname + ' is a ' + SNtype + '\n')
-                f.close()
             continue
 
         elif SNtype == '':
@@ -372,7 +367,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                 f.write('Type not specified by WISeREP.' +
                         'Check the Open Supernova Catalog for type.')
-                f.close()
 
         # create a directory even if the SN event has no spectra.
         # find other instances of mkSNdir to revert this.
@@ -387,7 +381,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                 f.write('From statement 4: ' + SNname +
                         ' has no spectra to collect' + '\n')
-                f.close()
             continue
 
         redshift = target[redshift_idx].text
@@ -495,11 +488,9 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                 f.write('Not collecting spectra of ' + SNname + ' at this time'
                         + '\n')
-                f.close()
 
             with open(_PATH + path + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
-                fp.close()
 
             updateListsJson(SNname, list_dict['completed'], list_dict, path)
             continue
@@ -518,7 +509,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                 with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                     f.write('Not collecting spectra of ' + SNname +
                             ' at this time' + '\n')
-                    f.close()
 
                 updateListsJson(SNname, list_dict['completed'], list_dict,
                                 path)
@@ -546,7 +536,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             print('\tWriting README')
             with open(_PATH + path + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
-                fp.close()
 
             updateListsJson(SNname, list_dict['completed'], list_dict, path)
 
@@ -567,7 +556,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                     with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                         f.write('Removing duplicate spectrum for ' + SNname +
                                 ' -- ' + filename + '\n')
-                        f.close()
 
             # remove host spectrum if it exists
             if SNname in obj_host_dict.keys():
@@ -583,7 +571,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                 with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                     f.write('Not collecting spectra of ' + SNname +
                             ' at this time' + '\n')
-                    f.close()
                 updateListsJson(SNname, list_dict['completed'], list_dict,
                                 path)
                 continue
@@ -613,7 +600,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                 with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                     f.write('Presumably no other duplicate files found for ' +
                             SNname + '\n')
-                    f.close()
 
             elif len(last_modified) == 2:
                 duplicate = min(last_modified, key=last_modified.get)
@@ -625,7 +611,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
                 with open(_PATH + path + 'scraper-log.txt', 'a') as f:
                     f.write('Removing duplicate spectrum for ' + SNname +
                             ' -- ' + duplicate + '\n')
-                    f.close()
 
             count = 1
             for filename, url in spectrum_haul.items():
@@ -649,7 +634,6 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             print('\tWriting README')
             with open(_PATH + path + SNname + '/README.json', 'w') as fp:
                 json.dump(SN_dict[SNname], fp, indent=4)
-                fp.close()
 
             updateListsJson(SNname, list_dict['completed'], list_dict, path)
 
@@ -657,11 +641,9 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
     list_dict['completed'] = []
     with open(_PATH + path + 'lists.json', 'w') as fp:
         json.dump(list_dict, fp, indent=4)
-        fp.close()
 
     # execution time in minutes
     minutes = (time.time() - start_time) / 60.0
     print("Runtime: %s minutes" % minutes)
     with open(_PATH + path + 'scraper-log.txt', 'a') as f:
         f.write('Runtime: ' + str(minutes) + ' minutes')
-        f.close()
