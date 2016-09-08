@@ -245,7 +245,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
         # SNname = item
 
         if SNname in list_dict['non_SN']:
-            print(SNname, 'is not a supernova -- Skipping')
+            print(SNname, 'is not a ' + incl_type_str + ' -- Skipping')
             continue
         elif SNname in list_dict['completed']:
             print(SNname, 'already done')
