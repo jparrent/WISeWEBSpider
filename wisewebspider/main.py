@@ -43,8 +43,8 @@ _WISEREP_SPECTRA_URL = 'http://wiserep.weizmann.ac.il/spectra/list'
 # list of non-supernovae to exclude
 exclude_type = [
     'Afterglow', 'LBV', 'ILRT', 'Nova', 'CV', 'Varstar', 'AGN', 'Galaxy',
-    'QSO', 'Std-spec', 'Gap', 'Gap I', 'Gap II', 'SN impostor', 'TDE', 'WR',
-    'WR-WN', 'WR-WC', 'WR-WO', 'Other'
+    'QSO', 'Std-spec', 'Gap', 'Gap I', 'Gap II', 'SN impostor', 'WR',
+    'WR-WN', 'WR-WC', 'WR-WO', 'Other', 'TDE'
 ]
 
 # list of SN survey programs to exclude, assuming they have already been
@@ -352,7 +352,8 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
 
         # exclude non-SN
         SNtype = target[type_idx].text
-        if (include_type and SNtype not in include_type) or (SNtype in exclude_type):
+        if ((include_type and SNtype not in include_type) or
+                (not include_type and SNtype in exclude_type)):
             updateListsJson(SNname, list_dict['non_SN'], list_dict, path)
             updateListsJson(SNname, list_dict['completed'], list_dict, path)
             print('\t', SNname, 'is a', SNtype)
