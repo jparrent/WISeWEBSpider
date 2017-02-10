@@ -135,7 +135,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
     # collect metadata for the few available host spectra and
     # build a dictionary that will be used below to
     # remove by SNname and "Spectrum Type"
-    browser = RoboBrowser(history=True, parser='lxml')
+    browser = RoboBrowser(history=False, parser='lxml')
     browser.open(_WISEREP_SPECTRA_URL)
     form = browser.get_form(action='/spectra/list')
     form['spectypeid'] = "2"  # 2 for Host spectrum
@@ -189,7 +189,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP):
         ])
 
     # begin scraping WISeREP OBJECTS page for supernovae
-    browser = RoboBrowser(history=True, parser='lxml')
+    browser = RoboBrowser(history=False, parser='lxml')
     browser.open(_WISEREP_OBJECTS_URL)
     form = browser.get_form(action='/objects/list')
 
