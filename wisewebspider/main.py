@@ -211,6 +211,7 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
         print('Collecting new spectra from the last', daysstr, 'days')
 
         form['daysago'] = daysstr
+        form['rowslimit'] = "10000"
         browser.submit_form(form)
 
         try:
