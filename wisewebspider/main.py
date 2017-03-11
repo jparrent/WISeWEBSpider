@@ -108,6 +108,14 @@ def main():
         type=str,
         action='store')
     parser.add_argument(
+        '--name',
+        '-n',
+        dest='name',
+        help='Name of specific event to pull',
+        default=None,
+        type=str,
+        action='store')
+    parser.add_argument(
         '--included-types',
         '-i',
         dest='include_type',
@@ -118,16 +126,18 @@ def main():
         action='store')
     args = parser.parse_args()
 
-    spider(update=args.update, daysago=args.daysago, path=args.path, include_type=args.include_type)
+    spider(update=args.update, daysago=args.daysago, name=args.name,
+           path=args.path, include_type=args.include_type)
 
     # for debugging
     # spider(update=True, daysago=30, path=_DIR_WISEREP)
 
 
-def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
+def spider(update=False, daysago=30, name=None, path=_DIR_WISEREP, include_type=[]):
     start_time = time.time()
 
-    incl_type_str = 'supernovae' if not include_type else '-'.join(include_type)
+    incl_type_str = 'supernovae' if not include_type else '-'.join(
+        include_type)
 
     if not os.path.exists(_PATH + path):
         os.mkdir(_PATH + path)
@@ -146,58 +156,59 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
     # collect metadata for the few available host spectra and
     # build a dictionary that will be used below to
     # remove by SNname and "Spectrum Type"
-    browser = RoboBrowser(history=False, parser='lxml')
-    browser.open(_WISEREP_SPECTRA_URL)
-    form = browser.get_form(action='/spectra/list')
-    form['spectypeid'] = "2"  # 2 for Host spectrum
-    form['rowslimit'] = "10000"
-    browser.submit_form(form)
-    print('\tHost page received')
-
     obj_host_dict = {}
-    obj_host_headers = (browser.find("tr", {"style": "font-weight:bold"})
-                        .findChildren("td"))
+    if daysago:
+        browser = RoboBrowser(history=False, parser='lxml')
+        browser.open(_WISEREP_SPECTRA_URL)
+        form = browser.get_form(action='/spectra/list')
+        form['spectypeid'] = "2"  # 2 for Host spectrum
+        form['rowslimit'] = "10000"
+        browser.submit_form(form)
+        print('\tHost page received')
 
-    for i, header in enumerate(obj_host_headers):
-        # if header.text == 'Obj. Name':
-        #     host_obj_name_idx = i
-        if header.text == 'Spec.Program':
-            host_program_idx = i
-        if header.text == 'Instrument':
-            host_instrument_idx = i
-        if header.text == 'Observer':
-            host_observer_idx = i
-        if header.text == 'Obs. Date':
-            host_obsdate_idx = i
-        if header.text == 'Reducer':
-            host_reducer_idx = i
-        if header.text == 'Ascii FileFits  File':
-            host_filename_idx = i
+        obj_host_headers = (browser.find("tr", {"style": "font-weight:bold"})
+                            .findChildren("td"))
 
-    obj_host_list = browser.find_all("a",
-                                     {"title": "Click to show/update object"})
+        for i, header in enumerate(obj_host_headers):
+            # if header.text == 'Obj. Name':
+            #     host_obj_name_idx = i
+            if header.text == 'Spec.Program':
+                host_program_idx = i
+            if header.text == 'Instrument':
+                host_instrument_idx = i
+            if header.text == 'Observer':
+                host_observer_idx = i
+            if header.text == 'Obs. Date':
+                host_obsdate_idx = i
+            if header.text == 'Reducer':
+                host_reducer_idx = i
+            if header.text == 'Ascii FileFits  File':
+                host_filename_idx = i
 
-    for i, obj in enumerate(obj_host_list):
-        print('\tParsing', i + 1, 'of', len(obj_host_list), 'host spectra')
-        obj_name = obj.text
-        host_children = obj.parent.parent.findChildren("td")
-        host_program = host_children[host_program_idx].text
-        host_instrument = host_children[host_instrument_idx].text
-        host_observer = host_children[host_observer_idx].text
-        host_obsdate = host_children[host_obsdate_idx].text
-        host_reducer = host_children[host_reducer_idx].text
-        host_filename = host_children[host_filename_idx].text
-        host_filename = host_filename.strip().split('\n')[0]
+        obj_host_list = browser.find_all(
+            "a", {"title": "Click to show/update object"})
 
-        obj_host_dict[obj_name] = OrderedDict([
-            ("Type", "Host spectrum"),
-            ("Filename", host_filename),
-            ("Obs. Date", host_obsdate),
-            ("Program", host_program),
-            ("Instrument", host_instrument),
-            ("Observer", host_observer),
-            ("Reducer", host_reducer),
-        ])
+        for i, obj in enumerate(obj_host_list):
+            print('\tParsing', i + 1, 'of', len(obj_host_list), 'host spectra')
+            obj_name = obj.text
+            host_children = obj.parent.parent.findChildren("td")
+            host_program = host_children[host_program_idx].text
+            host_instrument = host_children[host_instrument_idx].text
+            host_observer = host_children[host_observer_idx].text
+            host_obsdate = host_children[host_obsdate_idx].text
+            host_reducer = host_children[host_reducer_idx].text
+            host_filename = host_children[host_filename_idx].text
+            host_filename = host_filename.strip().split('\n')[0]
+
+            obj_host_dict[obj_name] = OrderedDict([
+                ("Type", "Host spectrum"),
+                ("Filename", host_filename),
+                ("Obs. Date", host_obsdate),
+                ("Program", host_program),
+                ("Instrument", host_instrument),
+                ("Observer", host_observer),
+                ("Reducer", host_reducer),
+            ])
 
     # begin scraping WISeREP OBJECTS page for supernovae
     browser = RoboBrowser(history=False, parser='lxml')
@@ -206,11 +217,14 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
 
     # ready search form with field entries to submit, depending on --update
     if browser and update:
-        daysstr = str(daysago)
-        # set "Added within the last args.daysago days"
-        print('Collecting new spectra from the last', daysstr, 'days')
+        if daysago:
+            daysstr = str(daysago)
+            # set "Added within the last args.daysago days"
+            print('Collecting new spectra from the last', daysstr, 'days')
 
-        form['daysago'] = daysstr
+            form['daysago'] = daysstr
+        if name:
+            form['name'] = name
         form['rowslimit'] = "10000"
         browser.submit_form(form)
 
@@ -218,7 +232,10 @@ def spider(update=False, daysago=30, path=_DIR_WISEREP, include_type=[]):
             new_objs = (browser.find("tr", {"style": "font-weight:bold"})
                         .parent.findChildren("tr", {"valign": "top"}))
         except AttributeError:
-            print('Nothing to collect since ' + daysstr + ' days ago')
+            if daysago:
+                print('Nothing to collect since ' + daysstr + ' days ago')
+            else:
+                print('Nothing to collect!')
             return
 
         new_objs = (browser.find("tr", {"style": "font-weight:bold"})
